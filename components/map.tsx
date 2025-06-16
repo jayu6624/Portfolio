@@ -1,51 +1,88 @@
 "use client"
 
-import { useEffect } from "react"
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet"
-import "leaflet/dist/leaflet.css"
+import { useEffect, useRef } from "react"
 import L from "leaflet"
-
-// Fix for default marker icons in react-leaflet
-function fixLeafletIcon() {
-  // Use type assertion to tell TypeScript about this property
-  const DefaultIcon = L.Icon.Default as any;
-  const prototype = DefaultIcon.prototype as any;
-  delete prototype._getIconUrl;
-  
-  L.Icon.Default.mergeOptions({
-    iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-    shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-  })
-}
+import "leaflet/dist/leaflet.css"
+import { useTheme } from "next-themes"
 
 export default function Map() {
+  const mapRef = useRef<HTMLDivElement>(null)
+  const { theme } = useTheme()
+  const mapInstanceRef = useRef<L.Map | null>(null)
+  
+  // Rajkot, Gujarat coordinates
+  const latitude = 22.3039
+  const longitude = 70.8022
+
   useEffect(() => {
-    fixLeafletIcon()
+    if (!mapRef.current) return
+
+    // If map already initialized, return
+    if (mapInstanceRef.current) return
+
+    // Initialize map
+    const map = L.map(mapRef.current).setView([latitude, longitude], 13)
+    mapInstanceRef.current = map
+
+    // Use appropriate tile layer based on theme
+    const tileLayer = theme === "dark" 
+      ? L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        })
+      : L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        })
+    
+    tileLayer.addTo(map)
+
+    // Add marker for location
+    const marker = L.marker([latitude, longitude])
+      .addTo(map)
+      .bindPopup("<b>Jaydeep Rathod</b><br>Rajkot, Gujarat, India")
+      .openPopup()
+
+    // Refresh map size after rendering
+    setTimeout(() => {
+      map.invalidateSize()
+    }, 100)
+
+    // Cleanup on unmount
+    return () => {
+      map.remove()
+      mapInstanceRef.current = null
+    }
   }, [])
 
-  // Coordinates for Rajkot, Gujarat, India
-  const position: [number, number] = [22.3039, 70.8022]
+  // Update map theme when theme changes
+  useEffect(() => {
+    if (!mapInstanceRef.current) return
+    
+    const map = mapInstanceRef.current
+    
+    // Remove existing tile layers
+    map.eachLayer(layer => {
+      if (layer instanceof L.TileLayer) {
+        map.removeLayer(layer)
+      }
+    })
+    
+    // Add appropriate tile layer based on theme
+    const tileLayer = theme === "dark" 
+      ? L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        })
+      : L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        })
+    
+    tileLayer.addTo(map)
+  }, [theme])
 
   return (
-    <div className="h-[250px] sm:h-[300px] w-full rounded-lg overflow-hidden">
-      <MapContainer 
-        center={position} 
-        zoom={13} 
-        scrollWheelZoom={false}
-        style={{ height: "100%", width: "100%" }}
-        attributionControl={false}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          className="dark:filter dark:brightness-[0.7] dark:contrast-[1.2]"
-        />
-        <Marker position={position}>
-          <Popup className="text-black">
-            Rajkot, Gujarat, India
-          </Popup>
-        </Marker>
-      </MapContainer>
-    </div>
+    <div 
+      ref={mapRef} 
+      className="h-[300px] w-full rounded-lg z-0" 
+      aria-label="Map showing Rajkot, Gujarat, India"
+    />
   )
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { useInView } from "react-intersection-observer"
@@ -8,8 +9,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle } from "lucide-react"
-import { toast } from "sonner" // You'll need to install this: npm install sonner
+import { Mail, Phone, MapPin, Send } from "lucide-react"
 import Map from "@/components/map"
 
 export default function Contact() {
@@ -25,39 +25,17 @@ export default function Contact() {
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    setSubmitStatus('idle')
 
-    try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+    // Simulate form submission
+    await new Promise((resolve) => setTimeout(resolve, 2000))
 
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to send message');
-      }
-
-      // Success
-      setFormData({ name: "", email: "", message: "" });
-      setSubmitStatus('success');
-      toast.success('Message sent successfully! I will get back to you soon.');
-    } catch (error) {
-      console.error('Error sending message:', error);
-      setSubmitStatus('error');
-      toast.error('Failed to send message. Please try again later.');
-    } finally {
-      setIsSubmitting(false);
-    }
+    console.log("Form submitted:", formData)
+    setFormData({ name: "", email: "", message: "" })
+    setIsSubmitting(false)
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -132,7 +110,7 @@ export default function Contact() {
               className="mt-8"
             >
               <h4 className="text-lg font-medium mb-3">Find me here</h4>
-              <div className="rounded-lg overflow-hidden shadow-md">
+              <div className="rounded-lg overflow-hidden shadow-md border border-border/50">
                 <Map />
               </div>
             </motion.div>
@@ -146,93 +124,66 @@ export default function Contact() {
           >
             <Card className="bg-card dark:bg-card/80">
               <CardContent className="p-6 sm:p-8">
-                {submitStatus === 'success' ? (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-center py-8"
-                  >
-                    <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                    <h3 className="text-xl font-bold mb-2">Message Sent!</h3>
-                    <p className="text-foreground/70 mb-6">
-                      Thanks for reaching out! I'll get back to you as soon as possible.
-                    </p>
-                    <Button 
-                      onClick={() => setSubmitStatus('idle')}
-                      variant="outline"
-                    >
-                      Send Another Message
-                    </Button>
-                  </motion.div>
-                ) : (
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                      <label htmlFor="name" className="block text-sm font-medium mb-2">
-                        Name
-                      </label>
-                      <Input
-                        id="name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        placeholder="Your full name"
-                        required
-                      />
-                    </div>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium mb-2">
+                      Name
+                    </label>
+                    <Input
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      placeholder="Your full name"
+                      required
+                    />
+                  </div>
 
-                    <div>
-                      <label htmlFor="email" className="block text-sm font-medium mb-2">
-                        Email
-                      </label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        placeholder="your.email@example.com"
-                        required
-                      />
-                    </div>
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium mb-2">
+                      Email
+                    </label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="your.email@example.com"
+                      required
+                    />
+                  </div>
 
-                    <div>
-                      <label htmlFor="message" className="block text-sm font-medium mb-2">
-                        Message
-                      </label>
-                      <Textarea
-                        id="message"
-                        name="message"
-                        value={formData.message}
-                        onChange={handleChange}
-                        placeholder="Tell me about your project or just say hello..."
-                        rows={5}
-                        required
-                      />
-                    </div>
+                  <div>
+                    <label htmlFor="message" className="block text-sm font-medium mb-2">
+                      Message
+                    </label>
+                    <Textarea
+                      id="message"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleChange}
+                      placeholder="Tell me about your project or just say hello..."
+                      rows={5}
+                      required
+                    />
+                  </div>
 
-                    {submitStatus === 'error' && (
-                      <div className="flex items-center gap-2 text-red-500 text-sm">
-                        <AlertCircle className="h-4 w-4" />
-                        <span>Failed to send message. Please try again.</span>
-                      </div>
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? (
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                        className="mr-2"
+                      >
+                        <Send className="h-4 w-4" />
+                      </motion.div>
+                    ) : (
+                      <Send className="mr-2 h-4 w-4" />
                     )}
-
-                    <Button type="submit" className="w-full" disabled={isSubmitting}>
-                      {isSubmitting ? (
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-                          className="mr-2"
-                        >
-                          <Send className="h-4 w-4" />
-                        </motion.div>
-                      ) : (
-                        <Send className="mr-2 h-4 w-4" />
-                      )}
-                      {isSubmitting ? "Sending..." : "Send Message"}
-                    </Button>
-                  </form>
-                )}
+                    {isSubmitting ? "Sending..." : "Send Message"}
+                  </Button>
+                </form>
               </CardContent>
             </Card>
           </motion.div>

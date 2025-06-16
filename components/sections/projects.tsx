@@ -99,7 +99,7 @@ export default function Projects() {
 							initial={{ opacity: 0, y: 50 }}
 							animate={inView ? { opacity: 1, y: 0 } : {}}
 							transition={{ duration: 0.6, delay: index * 0.1 }}
-							whileHover={{ scale: 1.02 }}
+							whileHover={{ scale: 1.01 }}
 							className="perspective-1000"
 						>
 							<motion.div
@@ -107,8 +107,8 @@ export default function Projects() {
 								transition={{ duration: 0.6 }}
 								className="relative preserve-3d h-[420px] sm:h-96"
 							>
-								{/* Front of card */}
-								<Card className="absolute inset-0 backface-hidden cursor-pointer shadow-md">
+								{/* Front of card - Enhanced design */}
+								<Card className="absolute inset-0 backface-hidden cursor-pointer border border-border dark:border-border/50">
 									<CardContent className="p-0 h-full">
 										<div className="relative h-full">
 											<img
@@ -116,24 +116,24 @@ export default function Projects() {
 												alt={project.title}
 												className="w-full h-48 object-cover rounded-t-lg"
 											/>
-											{/* Improved gradient overlay for better text visibility */}
-											<div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent rounded-t-lg" />
+											{/* Reduced opacity gradient for a more subtle effect */}
+											<div className="absolute inset-0   rounded-t-lg" />
 											<Button
 												variant="secondary"
 												size="icon"
-												className="absolute top-4 right-4 bg-black/30 backdrop-blur-sm hover:bg-black/50 text-white z-10"
+												className="absolute top-4 right-4  dark:text-white z-10 shadow-none"
 												onClick={() => setFlippedCard(index)}
 											>
 												<Play className="h-4 w-4" />
 											</Button>
 											<div className="p-6">
-												<span className="inline-block px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-200 rounded-full text-xs font-medium mb-3">
+												<span className="inline-block px-3 py-1 bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200 rounded-full text-xs font-medium mb-3 border border-blue-100 dark:border-blue-800/50">
 													{project.category} • {project.status}
 												</span>
-												<h3 className="text-xl font-bold mb-2 text-foreground dark:text-white">
+												<h3 className="text-xl font-bold mb-2">
 													{project.title}
 												</h3>
-												<p className="text-foreground/90 dark:text-white text-sm leading-relaxed">
+												<p className="text-foreground/80 text-sm leading-relaxed line-clamp-3">
 													{project.description}
 												</p>
 											</div>
@@ -141,14 +141,14 @@ export default function Projects() {
 									</CardContent>
 								</Card>
 
-								{/* Back of card */}
-								<Card className="absolute inset-0 backface-hidden rotate-y-180 cursor-pointer shadow-md">
+								{/* Back of card - Enhanced design */}
+								<Card className="absolute inset-0 backface-hidden rotate-y-180 cursor-pointer border border-border dark:border-border/50">
 									<CardContent className="p-6 h-full flex flex-col justify-between overflow-y-auto">
 										<div>
-											<h3 className="text-xl font-bold mb-4 text-foreground dark:text-white">
+											<h3 className="text-xl font-bold mb-4">
 												{project.title}
 											</h3>
-											<p className="text-foreground/90 dark:text-white/90 mb-6">
+											<p className="text-foreground/80 mb-6">
 												{project.description}
 											</p>
 											<div className="space-y-4">
@@ -160,7 +160,7 @@ export default function Projects() {
 														{project.technologies.map((tech) => (
 															<span
 																key={tech}
-																className="px-2 py-1 bg-accent text-accent-foreground rounded text-xs"
+																className="px-2 py-1 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200 rounded text-xs border border-blue-100 dark:border-blue-800/50"
 															>
 																{tech}
 															</span>
@@ -170,7 +170,12 @@ export default function Projects() {
 											</div>
 										</div>
 										<div className="flex gap-3 mt-6">
-											<Button variant="outline" size="sm" asChild>
+											<Button 
+												variant="outline" 
+												size="sm" 
+												asChild
+												className="border-gray-200 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900"
+											>
 												<a
 													href={project.githubUrl}
 													target="_blank"
@@ -180,7 +185,11 @@ export default function Projects() {
 													Code
 												</a>
 											</Button>
-											<Button size="sm" asChild>
+											<Button 
+												size="sm" 
+												asChild
+												className="bg-blue-600 hover:bg-blue-700 text-white"
+											>
 												<a
 													href={project.liveUrl}
 													target="_blank"
@@ -194,6 +203,7 @@ export default function Projects() {
 												variant="ghost"
 												size="sm"
 												onClick={() => setFlippedCard(null)}
+												className="hover:bg-gray-100 dark:hover:bg-gray-900"
 											>
 												Back
 											</Button>
