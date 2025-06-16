@@ -33,10 +33,12 @@ export default function Contact() {
     setIsSubmitting(true)
 
     try {
-      // Get API URL from environment variable or use localhost as fallback
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/contact";
+      // Use the deployed API URL
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://portfolio-contact-api-3pzv.onrender.com/api/contact";
       
-      // Use the dynamic API URL
+      console.log("Submitting to API URL:", apiUrl);
+      
+      // Use the API URL
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
