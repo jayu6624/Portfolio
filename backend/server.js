@@ -15,9 +15,9 @@ app.use(
       if (!origin) return callback(null, true);
 
       const allowedOrigins = [
-        process.env.FRONTEND_URL || "http://localhost:3000",
-        "https://portfolio-r4c2.vercel.app", // Your Vercel app URL
-        /\.vercel\.app$/, // Allow all vercel.app subdomains
+        "http://localhost:3000",  // Local frontend
+        "https://portfolio-r4c2.vercel.app", // Production frontend
+        /\.vercel\.app$/ // All Vercel subdomains
       ];
 
       // Check if the origin is allowed

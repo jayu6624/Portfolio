@@ -37,8 +37,15 @@ export default function Contact() {
     setSubmitSuccess(false)
 
     try {
-      // Make sure the API URL includes the /api/contact path
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://portfolio-contact-api-3pzv.onrender.com/api/contact";
+      // For local development, use localhost API
+      // For production, use the deployed API or environment variable
+      const isLocalDev = window.location.hostname === 'localhost';
+      const defaultApiUrl = isLocalDev 
+        ? "http://localhost:5000/api/contact"
+        : "https://portfolio-contact-api-3pzv.onrender.com/api/contact";
+      
+      // Use environment variable if available, otherwise use default
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || defaultApiUrl;
       
       // Check if URL already has /api/contact
       const finalApiUrl = apiUrl.includes('/api/contact') ? apiUrl : `${apiUrl}/api/contact`;
