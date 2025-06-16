@@ -10,8 +10,32 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
-    methods: ["POST", "GET"],
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps, curl requests)
+      if (!origin) return callback(null, true);
+
+      const allowedOrigins = [
+        process.env.FRONTEND_URL || "http://localhost:3000",
+        "https://portfolio-r4c2.vercel.app", // Your Vercel app URL
+        /\.vercel\.app$/, // Allow all vercel.app subdomains
+      ];
+
+      // Check if the origin is allowed
+      const isAllowed = allowedOrigins.some((allowedOrigin) => {
+        if (allowedOrigin instanceof RegExp) {
+          return allowedOrigin.test(origin);
+        }
+        return allowedOrigin === origin;
+      });
+
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        console.log("Origin not allowed by CORS:", origin);
+        callback(null, false);
+      }
+    },
+    methods: ["POST", "GET", "OPTIONS"],
     credentials: true,
   })
 );
