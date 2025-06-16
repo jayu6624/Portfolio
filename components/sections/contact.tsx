@@ -33,13 +33,16 @@ export default function Contact() {
     setIsSubmitting(true)
 
     try {
-      // Use the deployed API URL
+      // Make sure the API URL includes the /api/contact path
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://portfolio-contact-api-3pzv.onrender.com/api/contact";
       
-      console.log("Submitting to API URL:", apiUrl);
+      // Check if URL already has /api/contact
+      const finalApiUrl = apiUrl.includes('/api/contact') ? apiUrl : `${apiUrl}/api/contact`;
       
-      // Use the API URL
-      const response = await fetch(apiUrl, {
+      console.log("Submitting to API URL:", finalApiUrl);
+      
+      // Use the corrected API URL
+      const response = await fetch(finalApiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

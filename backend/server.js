@@ -120,8 +120,23 @@ const saveMessageToFile = (data) => {
   }
 };
 
-// Contact endpoint
+// Root route handler - add this after middleware setup and before other routes
+app.get("/", (req, res) => {
+  res.status(200).json({
+    message: "Portfolio Contact API is running",
+    endpoints: {
+      contact: "/api/contact",
+      health: "/health",
+      messages: "/api/messages",
+    },
+  });
+});
+
+// Contact endpoint - make sure the path is correct
 app.post("/api/contact", async (req, res) => {
+  // Log the request path to debug
+  console.log("Received request at path:", req.path);
+
   try {
     const { name, email, message } = req.body;
 
