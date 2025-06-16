@@ -136,6 +136,7 @@ app.get("/", (req, res) => {
 app.post("/api/contact", async (req, res) => {
   // Log the request path to debug
   console.log("Received request at path:", req.path);
+  console.log("Request body:", req.body);
 
   try {
     const { name, email, message } = req.body;
@@ -228,7 +229,11 @@ app.post("/api/contact", async (req, res) => {
     }
 
     // If we got here, email was sent successfully
-    res.status(200).json({ success: true });
+    res.status(200).json({
+      success: true,
+      message:
+        "Your message was sent successfully! We'll get back to you soon.",
+    });
   } catch (error) {
     console.error("Error processing contact form:", error);
 
