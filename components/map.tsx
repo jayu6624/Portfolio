@@ -5,7 +5,7 @@ import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 import { useTheme } from "next-themes"
 
-export default function Map() {
+const Map = () => {
   const mapRef = useRef<HTMLDivElement>(null)
   const { theme } = useTheme()
   const mapInstanceRef = useRef<L.Map | null>(null)
@@ -13,6 +13,11 @@ export default function Map() {
   // Rajkot, Gujarat coordinates
   const latitude = 22.3039
   const longitude = 70.8022
+
+  // Check if window is defined (client-side only)
+  if (typeof window === 'undefined') {
+    return <div className="h-[300px] bg-muted flex items-center justify-center">Map loading...</div>
+  }
 
   useEffect(() => {
     if (!mapRef.current) return
@@ -86,3 +91,5 @@ export default function Map() {
     />
   )
 }
+
+export default Map

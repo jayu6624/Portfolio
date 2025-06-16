@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { useInView } from "react-intersection-observer"
@@ -10,8 +9,18 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Mail, Phone, MapPin, Send } from "lucide-react"
-import Map from "@/components/map"
 import { useToast } from "@/components/ui/use-toast"
+import dynamic from 'next/dynamic'
+
+// Dynamically import the Map component with SSR disabled
+const Map = dynamic(() => import('@/components/map'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[300px] bg-muted flex items-center justify-center">
+      <span className="text-muted-foreground">Loading map...</span>
+    </div>
+  ),
+})
 
 export default function Contact() {
   const { toast } = useToast()

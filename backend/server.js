@@ -19,10 +19,12 @@ app.use(
 // Function to create email transporter
 const createTransporter = () => {
   console.log("Email service:", process.env.EMAIL_SERVICE);
-  
+
   // Try using a service like SendinBlue/Brevo as more reliable alternative
-  if ((process.env.EMAIL_SERVICE || "").toLowerCase() === "sendinblue" || 
-      (process.env.EMAIL_SERVICE || "").toLowerCase() === "brevo") {
+  if (
+    (process.env.EMAIL_SERVICE || "").toLowerCase() === "sendinblue" ||
+    (process.env.EMAIL_SERVICE || "").toLowerCase() === "brevo"
+  ) {
     console.log("Using SendinBlue/Brevo configuration");
     return nodemailer.createTransport({
       host: "smtp-relay.sendinblue.com",
@@ -33,7 +35,7 @@ const createTransporter = () => {
       },
     });
   }
-  
+
   // For Gmail specifically with updated config
   if ((process.env.EMAIL_SERVICE || "").toLowerCase() === "gmail") {
     console.log("Using Gmail specific configuration");
@@ -47,8 +49,8 @@ const createTransporter = () => {
       },
       tls: {
         // Fix for self-signed certificate issue
-        rejectUnauthorized: false
-      }
+        rejectUnauthorized: false,
+      },
     });
   }
 
@@ -65,25 +67,25 @@ const createTransporter = () => {
 
 // Fallback method to save messages to file if email fails
 const saveMessageToFile = (data) => {
-  const fs = require('fs');
-  const path = require('path');
-  const filePath = path.join(__dirname, 'contact_messages.json');
-  
+  const fs = require("fs");
+  const path = require("path");
+  const filePath = path.join(__dirname, "contact_messages.json");
+
   let messages = [];
   try {
     if (fs.existsSync(filePath)) {
-      const fileContent = fs.readFileSync(filePath, 'utf8');
+      const fileContent = fs.readFileSync(filePath, "utf8");
       messages = JSON.parse(fileContent);
     }
   } catch (err) {
     console.error("Error reading messages file:", err);
   }
-  
+
   messages.push({
     ...data,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
-  
+
   try {
     fs.writeFileSync(filePath, JSON.stringify(messages, null, 2));
     console.log("Message saved to file successfully");
@@ -117,16 +119,16 @@ app.post("/api/contact", async (req, res) => {
     // Validate required environment variables
     if (!process.env.EMAIL_USERNAME || !process.env.EMAIL_PASSWORD) {
       console.error("Missing email credentials in environment variables");
-      
+
       // Try fallback method to save message
       const saved = saveMessageToFile({ name, email, message });
       if (saved) {
         return res.status(200).json({
           success: true,
-          note: "Message saved to file due to missing email configuration"
+          note: "Message saved to file due to missing email configuration",
         });
       }
-      
+
       return res.status(500).json({
         error: "Server configuration error. Please contact the administrator.",
       });
@@ -134,12 +136,12 @@ app.post("/api/contact", async (req, res) => {
 
     let emailSent = false;
     let emailError = null;
-    
+
     // Try to send email
     try {
       console.log("Creating email transporter...");
       const transporter = createTransporter();
-      
+
       // Email content
       const mailOptions = {
         from: `"Portfolio Contact" <${process.env.EMAIL_USERNAME}>`,
@@ -171,28 +173,28 @@ app.post("/api/contact", async (req, res) => {
       emailError = error;
       // We'll continue to the fallback below
     }
-    
+
     // If email failed, try to save to file as fallback
     if (!emailSent) {
       const saved = saveMessageToFile({ name, email, message });
       if (saved) {
         return res.status(200).json({
           success: true,
-          note: "Message saved locally. We'll contact you soon."
+          note: "Message saved locally. We'll contact you soon.",
         });
       } else {
         // Both email and file saving failed
         throw emailError || new Error("Failed to process your message");
       }
     }
-    
+
     // If we got here, email was sent successfully
     res.status(200).json({ success: true });
   } catch (error) {
     console.error("Error processing contact form:", error);
 
     let errorMessage = "Failed to send message. Please try again later.";
-    
+
     if (error.code === "EAUTH") {
       errorMessage = "Email authentication failed. Check credentials.";
     } else if (error.code === "ESOCKET") {
@@ -200,10 +202,10 @@ app.post("/api/contact", async (req, res) => {
     } else if (error.code === "ECONNECTION") {
       errorMessage = "Connection error with mail server.";
     }
-    
+
     res.status(500).json({
       error: errorMessage,
-      code: error.code || "unknown"
+      code: error.code || "unknown",
     });
   }
 });
@@ -211,17 +213,17 @@ app.post("/api/contact", async (req, res) => {
 // Get all messages endpoint (for admin access only - in a real app, add authentication)
 app.get("/api/messages", (req, res) => {
   try {
-    const fs = require('fs');
-    const path = require('path');
-    const filePath = path.join(__dirname, 'contact_messages.json');
-    
+    const fs = require("fs");
+    const path = require("path");
+    const filePath = path.join(__dirname, "contact_messages.json");
+
     if (!fs.existsSync(filePath)) {
       return res.status(200).json({ messages: [] });
     }
-    
-    const fileContent = fs.readFileSync(filePath, 'utf8');
+
+    const fileContent = fs.readFileSync(filePath, "utf8");
     const messages = JSON.parse(fileContent);
-    
+
     res.status(200).json({ messages });
   } catch (error) {
     console.error("Error retrieving messages:", error);
@@ -238,8 +240,14 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log("Email configuration:");
   console.log("- SERVICE:", process.env.EMAIL_SERVICE || "(default)");
-  console.log("- USERNAME:", process.env.EMAIL_USERNAME ? "✓ set" : "❌ not set");
-  console.log("- PASSWORD:", process.env.EMAIL_PASSWORD ? "✓ set" : "❌ not set");
+  console.log(
+    "- USERNAME:",
+    process.env.EMAIL_USERNAME ? "✓ set" : "❌ not set"
+  );
+  console.log(
+    "- PASSWORD:",
+    process.env.EMAIL_PASSWORD ? "✓ set" : "❌ not set"
+  );
 });
 
 module.exports = app;

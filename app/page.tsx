@@ -8,7 +8,8 @@ import Skills from "@/components/sections/skills"
 import Experience from "@/components/sections/experience"
 import Projects from "@/components/sections/projects"
 import Achievements from "@/components/sections/achievements"
-import Contact from "@/components/sections/contact"
+// Importing Contact dynamically as it may contain browser-specific code
+const Contact = dynamic(() => import('@/components/sections/contact'), { ssr: false })
 import Education from "@/components/sections/education"
 const ThemeProvider = dynamic(() => import("@/components/theme-provider").then(mod => mod.ThemeProvider), { ssr: false })
 
